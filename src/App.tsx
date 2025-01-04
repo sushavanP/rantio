@@ -3,8 +3,9 @@ import { Textarea } from "./components/ui/textarea";
 import { CardHeader, Card, CardTitle, CardContent } from "./components/ui/card";
 import { Button } from "./components/ui/button";
 import { useSupabase } from "./Supabase/SupabaseHook";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Send } from "lucide-react";
+import Draggable from "react-draggable";
 
 interface Rant {
   id: number;
@@ -16,9 +17,9 @@ interface Rant {
 
 function App() {
   const supabase = useSupabase();
-  console.log("supabase in app", supabase);
   const [rants, setRants] = useState<Rant[]>([]);
   const [typedRant, setTypedRant] = useState<string>("");
+  const nodeRef = useRef(null);
 
   useEffect(() => {
     const fetchRants = async () => {
@@ -26,8 +27,6 @@ function App() {
         .from("rants")
         .select()
         .order("created_at", { ascending: false });
-
-      console.log("data is, ", data);
 
       if (error) console.error("Error fetching rants: ", error);
       else setRants(data);
@@ -47,11 +46,10 @@ function App() {
       };
       const allRants = [rantToSave, ...rants];
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("rants")
         .insert([rantToSave])
         .select();
-      console.log("DATA in insert", data);
 
       if (error) console.log("error in inserting values");
       setRants(allRants);
@@ -68,16 +66,24 @@ function App() {
         <section className="w-full grid grid-cols-1 md:place-items-center md:grid-cols-2 md:gap-8 lg:grid-cols-3 lg:gap-8">
           {rants &&
             rants.map((rant: Rant) => (
-              <Card key={rant.id} className="mt-4 w-full h-[200px] -z-0">
-                <CardHeader className="p-3">
-                  <div>
-                    <CardTitle className="text-lg">{rant.user}</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-1 h-[120px] overflow-hidden line-clamp-6">
-                  <p className="text-sm overflow-ellipsis">{rant.rant}</p>
-                </CardContent>
-              </Card>
+              <Draggable nodeRef={nodeRef}>
+                <Card
+                  ref={nodeRef}
+                  key={rant.id}
+                  className="mt-4 w-full h-[200px] -z-0"
+                >
+                  <CardHeader ref={nodeRef} className="p-3">
+                    <div>
+                      <CardTitle ref={nodeRef} className="text-lg">
+                        {rant.user}
+                      </CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-1 h-[120px] overflow-hidden line-clamp-6">
+                    <p className="text-sm overflow-ellipsis">{rant.rant}</p>
+                  </CardContent>
+                </Card>
+              </Draggable>
             ))}
         </section>
         <div className="relative w-full lg:left-1/4">
