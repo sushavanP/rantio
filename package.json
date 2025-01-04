@@ -19,7 +19,8 @@
     "react-dom": "^18.3.1",
     "react-draggable": "^4.4.6",
     "tailwind-merge": "^2.6.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "unique-username-generator": "^1.4.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
